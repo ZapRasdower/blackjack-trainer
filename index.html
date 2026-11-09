@@ -386,6 +386,8 @@ function why(cat,row,up,code){
 
 // ---------- Stats ----------
 let stats = load('bjt-stats', {cells:{}, hands:0, right:0, streak:0, best:0, cat:{hard:[0,0],soft:[0,0],pair:[0,0]}});
+// drop any bad keys saved by the first version
+for (const k in stats.cells) if (k.includes('[object')) delete stats.cells[k];
 function record(key,cat,ok){
   const c = stats.cells[key] || (stats.cells[key]={n:0,r:0,recent:[]});
   c.n++; if(ok) c.r++; c.recent.push(ok?1:0); if(c.recent.length>5) c.recent.shift();
@@ -462,11 +464,11 @@ let cur = null, answered = false;
 function deal(){
   const cell = pickCell();
   const pcards = cardsFor(cell);
-  const up = rankCard(cell.up==='A'?11:+cell.up);
-  cur = {...cell, pcards, up, code: TABLE[cell.cat][cell.row][cell.i]};
+  const upCard = rankCard(cell.up==='A'?11:+cell.up);
+  cur = {...cell, pcards, upCard, code: TABLE[cell.cat][cell.row][cell.i]};
   answered = false;
   const D = $('#dealer'), P = $('#player');
-  D.replaceChildren(cardEl(up), cardEl(null));
+  D.replaceChildren(cardEl(upCard), cardEl(null));
   P.replaceChildren(...pcards.map(cardEl));
   $('#ptotal').innerHTML = describe(cur);
   $$('#actions button').forEach(b=>{ b.disabled=false; b.classList.remove('right','wrong'); });
